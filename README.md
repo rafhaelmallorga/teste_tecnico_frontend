@@ -31,7 +31,7 @@ yarn dev
 
 [Voltar ao topo](#sumário)
 
-[**LINK DO DEPLY**](#)
+[**LINK DO DEPLY**](https://teste-tecnico-frontend-one.vercel.app/)
 
 ### **Tecnologias**
 
