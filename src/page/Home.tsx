@@ -8,11 +8,14 @@ import { yupResolver } from "@hookform/resolvers/yup"
 import { ICalcForm } from '../interface/calcForm'
 import api from '../api'
 import { toast } from 'react-hot-toast'
-
+import { useAnticipation } from '../providers/Anticipation'
+import BlankAnticipation from '../components/BlankAnticipation'
+import AntecipationCard from '../components/AntecipationCard'
 
 
 const Home = () => {
     const [isChecked, setIsChecked] = useState(false)
+    const { anticipation, setAnticipation } = useAnticipation()
 
     const schema = yup.object().shape({
         amount: yup.number().typeError("Campo obrigatório"),
@@ -56,19 +59,15 @@ const Home = () => {
             data = newData
         }
 
-        console.log(data)
-
         await api.post('', data).then(res => { 
-            console.log(res.data)
+            setAnticipation(res.data)
             toast.success("Sucesso!")
         })
         .catch((_) => toast.error("Algo deu errado!"))
     }
 
-    console.log(errors)
-
     return (
-        <section className='bg-white w-[608px] h-[550px]  flex justify-center items-center rounded border-[1px] border-[#D1DCE3]'>
+        <section className='bg-white w-[688px] h-[550px]  flex justify-center items-center rounded border-[1px] border-[#D1DCE3]'>
             <div className='flex-1 h-full flex flex-col items-center justify-around'>
                 <form onSubmit={handleSubmit(handleSim)} className='flex flex-col '>
                     <h1 className='text-[#656565] text-[20px] font-bold mb-5'>Simule sua Antecipação</h1>
@@ -84,8 +83,8 @@ const Home = () => {
                     <Button type='submit' />
                 </form>
             </div>
-            <div className='flex-[0.6] bg-[#D1DCE32E] h-full'>
-                <h3>Você receberá</h3>
+            <div className='flex-[0.7] bg-[#D1DCE32E] h-full'>
+                {anticipation ? <AntecipationCard infos={anticipation}/> : <BlankAnticipation />}
             </div>
             
         </section>

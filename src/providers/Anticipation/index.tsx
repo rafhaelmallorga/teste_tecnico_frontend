@@ -8,7 +8,7 @@ interface AnticipationProviderProps {
 const AnticipationContext = createContext<IAnticipationContext>({} as IAnticipationContext)
 
 export const AnticipationProvider = ({ children }: AnticipationProviderProps) => {
-    const [ anticipation, setAnticipation ] = useState({})
+    const [ anticipation, setAnticipation ] = useState()
 
     return (
         <AnticipationContext.Provider value={{anticipation, setAnticipation}}>
