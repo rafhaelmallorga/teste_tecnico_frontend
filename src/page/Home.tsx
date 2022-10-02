@@ -15,7 +15,14 @@ import AntecipationCard from '../components/AntecipationCard'
 
 const Home = () => {
     const [isChecked, setIsChecked] = useState(false)
+    const [loading, setLoading] = useState(false)
     const { anticipation, setAnticipation } = useAnticipation()
+
+    const testData = {
+        "amount": 15000,
+        "installments": 12,
+        "mdr": 4
+    }
 
     const schema = yup.object().shape({
         amount: yup.number().typeError("Campo obrigatório"),
@@ -32,6 +39,8 @@ const Home = () => {
 
 
     const handleSim = async (data: ICalcForm) => {
+        setLoading(true)
+
         const amountInCents = data.amount * 100;
         const daysArray = data.days?.split(',').map((n: any) => Number(n))
 
@@ -64,10 +73,25 @@ const Home = () => {
             toast.success("Sucesso!")
         })
         .catch((_) => toast.error("Algo deu errado!"))
+
+        setLoading(false)
     }
 
     return (
         <section className='bg-white w-[688px] h-[550px]  flex justify-center items-center rounded border-[1px] border-[#D1DCE3]'>
+            <div className='absolute top-40'>
+                <button className='bg-red-400 rounded p-2 text-white font-bold mx-2 hover:brightness-90' onClick={() => api.post('?timeout', testData).then((_) => {}).catch(err => toast.error(`${err.message} - Server Timeout`))}>Teste Timeout</button>
+                <button className='bg-red-400 rounded p-2 text-white font-bold mx-2 hover:brightness-90' onClick={() => api.post('?internalError', testData).then((_) => {}).catch(err => toast.error(`${err.message} - Server Internal Error`))}>Teste Internal Error</button>
+                <button className='bg-red-400 rounded p-2 text-white font-bold mx-2 hover:brightness-90' onClick={async () => {
+                        setLoading(true)
+                        await api.post('?delay=4000', testData).then((res) => {
+                            toast.success('Sucesso!')
+                            setAnticipation(res.data)
+                        }).catch(err => toast.error(`${err.message} - Serve`))
+                        setLoading(false)
+                    }
+                }>Teste Delay</button>
+            </div>
             <div className='flex-1 h-full flex flex-col items-center justify-around'>
                 <form onSubmit={handleSubmit(handleSim)} className='flex flex-col '>
                     <h1 className='text-[#656565] text-[20px] font-bold mb-5'>Simule sua Antecipação</h1>
@@ -84,9 +108,8 @@ const Home = () => {
                 </form>
             </div>
             <div className='flex-[0.7] bg-[#D1DCE32E] h-full'>
-                {anticipation ? <AntecipationCard infos={anticipation}/> : <BlankAnticipation />}
+                {anticipation ? <AntecipationCard infos={anticipation} loading={loading}/> : <BlankAnticipation loading={loading}/>}
             </div>
-            
         </section>
     )
 }
